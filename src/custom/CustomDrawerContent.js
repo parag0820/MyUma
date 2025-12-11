@@ -11,14 +11,6 @@ export default function CustomDrawerContent(props) {
   const [categoryExpanded, setCategoryExpanded] = useState(false);
   const [categoryListData, setCategoryListData] = useState([]);
 
-  const categories = [
-    {id: '1', name: 'APARTMENTS', images: 'https://...'},
-    {id: '2', name: 'EAT & DRINK', images: 'https://...'},
-    {id: '3', name: 'EVENT', images: 'https://...'},
-    {id: '4', name: 'FITNESS', images: 'https://...'},
-    {id: '6', name: 'new dummy', images: 'https://...'},
-  ];
-
   const categoryList = async () => {
     try {
       const response = await axios.get(`${BASE_URL}myumacategory`);
@@ -154,5 +146,6 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 14,
     fontWeight: '400',
+    color: '#000',
   },
 });

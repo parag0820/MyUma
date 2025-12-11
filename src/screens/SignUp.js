@@ -195,8 +195,8 @@ const SignUp = ({navigation}) => {
         </View>
         <TextInput
           placeholder="First Name"
-          value={formData.firstName}
           placeholderTextColor={'gray'}
+          value={formData.firstName}
           onChangeText={text => handleChange('firstName', text)}
           onBlur={() => handleBlur('firstName')}
           style={styles.input}
@@ -207,8 +207,8 @@ const SignUp = ({navigation}) => {
 
         <TextInput
           placeholder="Last Name"
-          value={formData.lastName}
           placeholderTextColor={'gray'}
+          value={formData.lastName}
           onChangeText={text => handleChange('lastName', text)}
           onBlur={() => handleBlur('lastName')}
           style={styles.input}
@@ -352,6 +352,7 @@ const styles = StyleSheet.create({
   },
   radioText: {
     fontSize: 14,
+    color: '#000',
   },
   agreeText: {
     marginTop: 20,

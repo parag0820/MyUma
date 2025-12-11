@@ -110,6 +110,7 @@ const Message = () => {
             value={message}
             onChangeText={setMessage}
             placeholder="Type a message"
+            placeholderTextColor={'gray'}
             style={styles.textInput}
           />
           <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
@@ -154,6 +155,7 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
+    color: '#000',
   },
   timestamp: {
     fontSize: 10,
@@ -171,6 +173,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
+    color: '#000',
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#ccc',

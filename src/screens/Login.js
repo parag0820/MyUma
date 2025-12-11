@@ -76,14 +76,14 @@ const Login = ({navigation}) => {
     }
 
     if (hasError) return;
-
+    const payload = {
+      email: trimmedEmail,
+      password: trimmedPassword,
+    };
     try {
       const loginResponse = await axios.post(
         `${BASE_URL}myumaloginbypassword`,
-        {
-          email: trimmedEmail,
-          password: trimmedPassword,
-        },
+        payload,
       );
 
       // Check the actual success flag/message

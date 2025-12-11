@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, {useCallback, useState} from 'react'; // <-- Make sure useState is imported
+import React, {useEffect, useState} from 'react'; // <-- Make sure useState is imported
 import {
   View,
   Text,
@@ -8,9 +8,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import BASE_URL from '../utils/styles/config';
 import {useFocusEffect} from '@react-navigation/native';
+import Loader from '../custom/Loader';
 
 const {width} = Dimensions.get('window');
 
@@ -130,6 +132,7 @@ const Home = ({navigation}) => {
   const [categoryServices, setCategoryServices] = useState([]);
   const [category, setCategory] = useState([]);
   const [selectedTab, setSelectedTab] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const categoryGetList = async () => {
     try {
@@ -186,25 +189,38 @@ const Home = ({navigation}) => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      recentServicesGet();
-      categoryList();
-      getBlogData();
-      categoryGetList();
-    }, []),
-  );
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        recentServicesGet(),
+        categoryList(),
+        getBlogData(),
+        categoryGetList(),
+      ]);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchAllData(); // Runs only once
+  }, []);
+  const refresh = () => fetchAllData();
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-                <Icon name="apps" size={24} />
-                <Image source={require('../assets/myuma_logo.png')} style={styles.logo} />
-                <Icon name="heart-outline" size={24} />
-            </View> */}
-
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={refresh} />
+      }>
       {/* Categories */}
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -419,6 +435,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryTitle: {
+    color: '#000',
     fontWeight: '600',
     marginTop: 6,
     fontSize: 14,
@@ -434,6 +451,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   serviceTitle: {
+    color: '#000',
     fontSize: 20,
     fontWeight: '600',
   },
@@ -482,6 +500,7 @@ const styles = StyleSheet.create({
   serviceName: {
     fontSize: 14,
     fontWeight: '600',
+    color: '#000',
   },
   serviceLocation: {
     fontSize: 12,
@@ -491,6 +510,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginTop: 4,
+    color: '#000',
   },
   blogView: {
     // flexDirection: 'row'
@@ -530,6 +550,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     marginLeft: 10,
+    color: '#000',
   },
 });
 

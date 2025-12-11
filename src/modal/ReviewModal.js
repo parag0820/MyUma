@@ -74,6 +74,7 @@ const ReviewModal = ({visible, onClose, onSubmit, serviceId}) => {
           <TextInput
             style={styles.input}
             placeholder="Write your review..."
+            placeholderTextColor={'gray'}
             value={reviewText}
             onChangeText={setReviewText}
             multiline
@@ -111,6 +112,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 18,
+    color: '#333',
     fontWeight: '600',
     marginBottom: 10,
     textAlign: 'center',

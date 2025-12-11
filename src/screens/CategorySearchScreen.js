@@ -14,12 +14,14 @@ import {useRoute} from '@react-navigation/native';
 import BASE_URL from '../utils/styles/config';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../custom/Loader';
 
 export default function CategorySearchScreen({navigation}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryList, setCategoryList] = useState([]);
   const [likedItems, setLikedItems] = useState(new Set()); // Using Set to store liked item IDs
   const [favoriteData, setFavoriteData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const route = useRoute();
   const catId = route?.params?.categoryId;
@@ -28,6 +30,7 @@ export default function CategorySearchScreen({navigation}) {
     try {
       const res = await axios.get(`${BASE_URL}myumaserviceviewone/${catId}`);
       setCategoryList(res.data.data || []);
+      setLoading(false);
     } catch (error) {
       console.log('Error fetching category:', error);
     }
@@ -130,12 +133,17 @@ export default function CategorySearchScreen({navigation}) {
       item.address?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
           placeholder="Search for Items"
+          placeholderTextColor={'gray'}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -202,7 +210,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
   },
-  searchInput: {flex: 1, padding: 8},
+  searchInput: {flex: 1, padding: 8, color: '#000'},
   categoryTabs: {flexDirection: 'row', marginBottom: 10, flexWrap: 'wrap'},
   categoryItem: {
     padding: 10,
@@ -226,7 +234,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   image: {height: 100, borderRadius: 10, marginBottom: 8},
-  title: {fontWeight: 'bold', fontSize: 14},
+  title: {fontWeight: 'bold', fontSize: 14, color: '#000'},
   location: {fontSize: 12, color: '#666'},
   price: {marginTop: 4, fontSize: 12, color: '#2a9d8f'},
   noDataContainer: {
