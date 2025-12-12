@@ -1,26 +1,31 @@
 import axios from 'axios';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View,
   Text,
   TouchableOpacity,
   StyleSheet,
   FlatList,
   SafeAreaView,
+  View,
 } from 'react-native';
 import BASE_URL from '../utils/styles/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ActivatedPlan = ({navigation, route}) => {
+const ActivatedPlan = ({navigation}) => {
+  const [plan, setPlan] = useState([]);
+
   const userPlan = async () => {
-    const userData = await AsyncStorage.getItem('userInfo');
-    const userInfo = JSON.parse(userData);
-    const userId = userInfo?.id;
     try {
-      const planResponse = await axios.get(
+      const userData = await AsyncStorage.getItem('userInfo');
+      const userInfo = JSON.parse(userData);
+      const userId = userInfo?.id;
+
+      const response = await axios.get(
         `${BASE_URL}myumaplanviewplan/${userId}`,
       );
-      console.log('planResponse', planResponse?.data?.data);
+
+      console.log('planResponse', response?.data?.data);
+      setPlan(response?.data?.data || []);
     } catch (error) {
       console.log(error);
     }
@@ -30,39 +35,39 @@ const ActivatedPlan = ({navigation, route}) => {
     userPlan();
   }, []);
 
-  const planData = {
-    planName: 'Premium Plan',
-    validity: 30,
-    startDate: '01 July 2025',
-    endDate: '31 July 2025',
-    features: ['Unlimited Chat', '10 Audio Calls', '5 Video Consultations'],
-  };
-
-  const {planName, validity, startDate, endDate, features} = planData;
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Activated Plan</Text>
+      <Text style={styles.heading}>My Active Plan</Text>
 
-      <Text style={styles.label}>
-        Plan Name: <Text style={styles.value}>{planName}</Text>
-      </Text>
-      <Text style={styles.label}>
-        Validity: <Text style={styles.value}>{validity} days</Text>
-      </Text>
-      <Text style={styles.label}>
-        Start Date: <Text style={styles.value}>{startDate}</Text>
-      </Text>
-      <Text style={styles.label}>
-        End Date: <Text style={styles.value}>{endDate}</Text>
-      </Text>
-
-      <Text style={[styles.label, {marginTop: 10}]}>Features:</Text>
       <FlatList
-        data={features}
+        data={plan}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
-          <Text style={styles.featureItem}>✓ {item}</Text>
+          <View style={styles.card}>
+            <Text style={styles.planTitle}>{item?.tittle}</Text>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Price</Text>
+              <Text style={[styles.value, {color: 'green'}]}>
+                {item?.price}
+              </Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Duration</Text>
+              <Text style={styles.value}>{item?.duration}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Start Date</Text>
+              <Text style={styles.value}>{item?.created_date}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>End Date</Text>
+              <Text style={styles.value}>{item?.expire_date}</Text>
+            </View>
+          </View>
         )}
       />
 
@@ -76,39 +81,71 @@ const ActivatedPlan = ({navigation, route}) => {
 };
 
 export default ActivatedPlan;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F2F4F7',
     padding: 20,
   },
+
   heading: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1B1B1B',
+    marginBottom: 15,
     alignSelf: 'center',
   },
-  label: {
-    fontSize: 16,
-    marginVertical: 2,
+
+  card: {
+    backgroundColor: '#fff',
+    padding: 18,
+    borderRadius: 14,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: {width: 0, height: 2},
+    shadowRadius: 6,
   },
+
+  planTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#4C6EF5',
+    marginBottom: 12,
+    alignSelf: 'center',
+  },
+
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 6,
+  },
+
+  label: {
+    fontSize: 18,
+    color: '#555',
+    fontWeight: 'bold',
+  },
+
   value: {
+    fontSize: 16,
+    color: '#1B1B1B',
     fontWeight: '600',
   },
-  featureItem: {
-    fontSize: 14,
-    marginLeft: 10,
-    marginVertical: 1,
-  },
+
   closeButton: {
-    marginTop: 25,
-    padding: 12,
-    backgroundColor: 'tomato',
-    borderRadius: 8,
+    marginTop: 10,
+    padding: 15,
+    backgroundColor: '#4C6EF5',
+    borderRadius: 10,
     alignItems: 'center',
   },
+
   closeButtonText: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });

@@ -60,7 +60,7 @@ const ReviewModal = ({visible, onClose, onSubmit, serviceId}) => {
         <View style={styles.modalContent}>
           <Text style={styles.heading}>Rate the Service</Text>
 
-          <View style={{backgroundColor: '#ddd', paddingVertical: 10}}>
+          <View style={{backgroundColor: '#fff', paddingVertical: 10}}>
             <Rating
               showRating={false}
               imageSize={30}
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
+    color: '#000',
     borderRadius: 8,
     padding: 10,
     height: 80,

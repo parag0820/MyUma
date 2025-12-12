@@ -62,10 +62,10 @@ const Pricing = ({navigation}) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Pricing</Text>
+      {/* <Text style={styles.heading}>Pricing</Text>
       <Text style={styles.subHeading}>
         Sacramento Business Listing and Directory
-      </Text>
+      </Text> */}
 
       <View style={styles.cardContainer}>
         {planData.map(plan => (
@@ -105,18 +105,19 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#F9FAFB',
   },
-  heading: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  subHeading: {
-    fontSize: 14,
-    color: '#777',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
+  // heading: {
+  //   color: '#111',
+  //   fontSize: 26,
+  //   fontWeight: 'bold',
+  //   marginBottom: 6,
+  //   textAlign: 'center',
+  // },
+  // subHeading: {
+  //   fontSize: 14,
+  //   color: '#777',
+  //   marginBottom: 20,
+  //   textAlign: 'center',
+  // },
   cardContainer: {
     flexDirection: 'column',
     gap: 16,

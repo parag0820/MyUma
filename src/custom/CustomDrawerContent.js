@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 16,
     flex: 1,
+    color: '#000',
   },
   dropdownContent: {
     // paddingLeft: 40,
