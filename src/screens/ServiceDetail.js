@@ -283,8 +283,6 @@ const styles = StyleSheet.create({
   slide: {
     width,
     alignItems: 'center',
-    // justifyContent: 'center',
-    // paddingTop: 60,
   },
   image: {
     width: width * 1,
@@ -297,19 +295,15 @@ const styles = StyleSheet.create({
   },
   ItemView: {
     marginHorizontal: 10,
-    // marginLeft: 10
   },
   title: {
     fontSize: 16,
     fontWeight: '500',
-    // marginTop: 40,
+
     color: '#000',
     textAlign: 'center',
   },
   languageBtn: {
-    // position: 'absolute',
-    // top: 40,
-    // right: 20,
     backgroundColor: '#fff',
     paddingVertical: 6,
     paddingHorizontal: 16,
@@ -320,15 +314,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  footer: {
-    // position: 'absolute',
-    // bottom: 50,
-    // width,
-    // flexDirection: 'row',
-    // justifyContent: 'space-between',
-    // paddingHorizontal: 40,
-    // alignItems: 'center',
-  },
+  footer: {},
   bookNowBtn: {
     backgroundColor: '#006400',
     justifyContent: 'center',

@@ -1,13 +1,6 @@
 import axios from 'axios';
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Pressable,
-  Alert,
-} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, Pressable} from 'react-native';
 import BASE_URL from '../utils/styles/config';
 import SubscribeModal from '../modal/Subscribe';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,17 +13,18 @@ const Pricing = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleSubscribe = async payload => {
-    navigation.navigate('Checkout', {totalAmount: planAmount});
-
-    // try {
-    //   const response = axios.post(`${BASE_URL}userplanpost`, payload);
-    //   console.log('SUCCESS', response?.data);
-
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const payloads = {
+      user_id: userId,
+      plan_id: selectedPlanId,
+    };
+    try {
+      const response = await axios.post(`${BASE_URL}userplanpost`, payloads);
+      navigation.navigate('Checkout', {totalAmount: planAmount});
+    } catch (error) {
+      console.log(error);
+    }
     // 🔁 Replace with your Axios POST request
-    // axios.post(`${BASE_URL}/subscribe`, payload)
+    axios.post(`${BASE_URL}/subscribe`, payload);
     setModalVisible(false);
   };
 

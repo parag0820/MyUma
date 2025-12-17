@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import BASE_URL from '../utils/styles/config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Colors from '../utils/styles/Colors';
 
 const ActivatedPlan = ({navigation}) => {
   const [plan, setPlan] = useState([]);
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#4C6EF5',
+    color: Colors.buttonRounded,
     marginBottom: 12,
     alignSelf: 'center',
   },
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     padding: 15,
-    backgroundColor: '#4C6EF5',
+    backgroundColor: Colors.buttonRounded,
     borderRadius: 10,
     alignItems: 'center',
   },

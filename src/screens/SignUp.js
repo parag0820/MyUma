@@ -74,18 +74,45 @@ const SignUp = ({navigation}) => {
       password: formData.password,
       type: formData.userType,
     };
-    console.log('signup apyload', payload);
 
     try {
-      const signUpResponse = await axios.post(
-        `${BASE_URL}userRegister`,
-        payload,
-      );
-      console.log('userResponse ', signUpResponse?.data?.data);
-      showToast();
+      const response = await axios.post(`${BASE_URL}userRegister`, payload);
+
+      const res = response?.data;
+      console.log('Signup response:', res);
+
+      // ❌ Email already exists
+      if (res?.message === 'Email already exists.') {
+        Toast.show({
+          type: 'error',
+          text1: 'Registration Failed',
+          text2: res.message,
+        });
+        return;
+      }
+
+      // ✅ Successful registration
+      if (res?.status === true || res?.success === true) {
+        showToast(); // success toast + navigation
+        return;
+      }
+
+      // ❌ Any other API error
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: res?.message || 'Something went wrong',
+      });
     } catch (error) {
-      console.log(error);
-      console.log('user Error ', error.response);
+      console.log('Signup error:', error?.response || error);
+
+      Toast.show({
+        type: 'error',
+        text1: 'Network Error',
+        text2:
+          error?.response?.data?.message ||
+          'Unable to register. Please try again.',
+      });
     }
   };
 

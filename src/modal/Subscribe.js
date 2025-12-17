@@ -2,25 +2,38 @@ import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {Modal, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
-const SubscribeModal = ({visible, onClose, onSubscribe, userId, planId}) => {
+const SubscribeModal = ({visible, onClose, onSubscribe}) => {
   const navigation = useNavigation();
+
   return (
-    <Modal transparent animationType="slide" visible={visible}>
+    <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.title}>Confirm Subscription</Text>
+          {/* Title */}
+          <Text style={styles.title}>Confirm Your Subscription</Text>
+
+          {/* Description */}
           <Text style={styles.bodyText}>
-            You're about to subscribe to Plan!{' '}
+            You’re about to activate this plan and enjoy all premium features.
           </Text>
 
+          {/* Divider */}
+          <View style={styles.divider} />
+
+          {/* Buttons */}
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              activeOpacity={0.8}
+              onPress={onClose}>
+              <Text style={styles.cancelText}>Not Now</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.subscribeBtn} onPress={onSubscribe}>
-              {/* onPress={() => onSubscribe({user_id: userId, plan_id: planId})}> */}
-              <Text style={styles.subscribeText}>Subscribe</Text>
+            <TouchableOpacity
+              style={styles.subscribeBtn}
+              activeOpacity={0.8}
+              onPress={onSubscribe}>
+              <Text style={styles.subscribeText}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -34,52 +47,59 @@ export default SubscribeModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    elevation: 5,
+    width: '85%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 22,
+    elevation: 10,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 8,
   },
   bodyText: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 15,
+    color: '#4B5563',
+    lineHeight: 22,
+    marginBottom: 18,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 18,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
   cancelBtn: {
-    marginRight: 15,
-    alignSelf: 'flex-start',
-    backgroundColor: 'tomato',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    marginRight: 12,
   },
   cancelText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#374151',
+    fontSize: 15,
+    fontWeight: '600',
   },
   subscribeBtn: {
-    backgroundColor: '#007BFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#2563EB',
   },
   subscribeText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
 });

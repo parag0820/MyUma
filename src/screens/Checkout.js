@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   Alert,
   ActivityIndicator,
@@ -14,84 +13,88 @@ import axios from 'axios';
 import {CardField, useStripe} from '@stripe/stripe-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRoute} from '@react-navigation/native';
-
-const API_URL = 'https://myuma.net/api/ApiCommonController/charge'; // ← replace with your backend
+import BASE_URL from '../utils/styles/config';
 
 export default function Checkout({navigation}) {
-  const {createToken} = useStripe();
-  const [cardDetailsComplete, setCardDetailsComplete] = useState(false);
-  const [cardFieldKey, setCardFieldKey] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const {createPaymentMethod} = useStripe();
   const route = useRoute();
+
   const amountTotal = route?.params?.totalAmount;
-  const [amount, setAmount] = useState(amountTotal);
+
+  // remove currency symbols
+  const numericAmount = amountTotal
+    ? Number(amountTotal.replace(/[^0-9.]/g, ''))
+    : 0;
+
+  const [amount] = useState(numericAmount);
+  const [cardDetailsComplete, setCardDetailsComplete] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handlePayment = async () => {
-    if (!amount || isNaN(Number(amount))) {
-      Alert.alert('Validation', 'Please enter a valid amount.');
+    if (!amount || isNaN(amount)) {
+      Alert.alert('Validation', 'Invalid amount');
       return;
     }
+
     if (!cardDetailsComplete) {
-      Alert.alert('Validation', 'Please enter complete card details.');
+      Alert.alert('Validation', 'Please enter complete card details');
       return;
     }
 
     setLoading(true);
-    const userData = await AsyncStorage.getItem('userInfo');
-    const userInfo = JSON.parse(userData);
-    const userId = userInfo?.id;
-    const userLogin = await AsyncStorage.getItem('userLogin');
-    const isLogin = JSON.parse(userLogin);
 
     try {
-      // Create a Stripe token from the CardField input
-      const {token, error} = await createToken({type: 'Card'});
+      const userData = await AsyncStorage.getItem('userInfo');
+      if (!userData) {
+        Alert.alert('Error', 'User not logged in');
+        return;
+      }
+
+      const userInfo = JSON.parse(userData);
+      const userId = userInfo?.id || userInfo?.user_id || userInfo?._id;
+
+      if (!userId) {
+        console.log('userInfo:', userInfo);
+        Alert.alert('Error', 'User ID missing');
+        return;
+      }
+
+      // ✅ CREATE PAYMENT METHOD
+      const {paymentMethod, error} = await createPaymentMethod({
+        paymentMethodType: 'Card',
+      });
 
       if (error) {
-        console.error('Stripe token error:', error);
-        Alert.alert(
-          'Card Error',
-          error.message || 'Failed to create card token',
-        );
-        setLoading(false);
+        Alert.alert('Card Error', error.message);
         return;
       }
 
-      if (!token?.id) {
-        Alert.alert('Card Error', 'No token returned from Stripe.');
-        setLoading(false);
+      if (!paymentMethod?.id) {
+        Alert.alert('Error', 'Payment method creation failed');
         return;
       }
 
-      // Send token, amount and user_id to your backend API
+      // ✅ SEND CORRECT PAYLOAD
       const payload = {
-        stripeToken: 'tok_visa', // e.g. "tok_1Hxxxx"
-        amount: String(amount), // backend expects string in your example
+        stripeToken: paymentMethod.id, // 🔥 IMPORTANT
+        amount: Math.round(amount * 100),
         user_id: userId,
       };
 
-      const resp = await axios.post(API_URL, payload, {
-        headers: {'Content-Type': 'application/json'},
-        timeout: 30000,
-      });
+      console.log('PAYMENT PAYLOAD:', payload);
 
-      // handle response from backend
-      Alert.alert('Success', 'Payment completed successfully!');
-      // reset UI or navigate
-      setAmount('');
-      if (isLogin === 'Login successful') {
-        navigation.navigate('Setting');
-      }
+      const response = await axios.post(`${BASE_URL}charge`, payload);
+
+      console.log('Payment response:', response.data);
+
+      Alert.alert('Success', 'Payment completed successfully');
       navigation.navigate('BottomNav');
-      setCardFieldKey(prev => prev + 1);
     } catch (err) {
-      console.error(
-        'Payment request failed:',
-        err?.response?.data ?? err.message ?? err,
-      );
+      console.log('Payment error full:', err?.response?.data || err);
+
       Alert.alert(
-        'Payment failed',
-        err?.response?.data?.message ?? 'An error occurred',
+        'Payment Failed',
+        err?.response?.data?.message || 'Payment could not be completed',
       );
     } finally {
       setLoading(false);
@@ -100,53 +103,43 @@ export default function Checkout({navigation}) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.select({ios: 'padding', android: undefined})}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{flex: 1}}>
       <View style={styles.container}>
-        <Text style={styles.label}>Amount </Text>
-        {/* <TextInput
-          placeholder="Enter amount (e.g. 50)"
-          value={amount}
-          onChangeText={t => setAmount(t.replace(/[^0-9.]/g, ''))}
-          keyboardType="numeric"
-          style={styles.input}
-          returnKeyType="done"
-        /> */}
-        <View style={styles.input}>
-          <Text style={styles.textAmount}>{amount}</Text>
+        <Text style={styles.label}>Amount</Text>
+        <View style={styles.amountBox}>
+          <Text style={styles.amountText}>{amount}</Text>
         </View>
 
-        <Text style={[styles.label, {marginTop: 8}]}>Card Details</Text>
+        <Text style={[styles.label, {marginTop: 12}]}>Card Details</Text>
+
         <CardField
-          key={cardFieldKey}
           postalCodeEnabled={false}
-          placeholders={{number: '4242 4242 4242 4242'}}
-          cardStyle={{
-            backgroundColor: '#FFFFFF', // valid
-            textColor: '#000000', // required for text visibility
-            fontSize: 16,
+          placeholders={{
+            number: '4242 4242 4242 4242',
+            expiration: 'MM/YY',
+            cvc: 'CVC',
           }}
-          style={styles.cardContainer}
-          onCardChange={card => setCardDetailsComplete(Boolean(card?.complete))}
+          cardStyle={styles.cardContainer}
+          style={styles.cardField}
+          onCardChange={card => {
+            setCardDetailsComplete(card?.complete === true);
+          }}
         />
 
         <TouchableOpacity
           style={[
             styles.payButton,
-            (!cardDetailsComplete || !amount || loading) && styles.disabled,
+            (!cardDetailsComplete || loading) && styles.disabled,
           ]}
           onPress={handlePayment}
-          disabled={!cardDetailsComplete || !amount || loading}>
+          disabled={!cardDetailsComplete || loading}>
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.payButtonText}>Pay Now</Text>
           )}
         </TouchableOpacity>
-
-        {/* <Text style={styles.small}>
-          Using Stripe test card: 4242 4242 4242 4242 — any future expiry/CVC.
-        </Text> */}
       </View>
     </KeyboardAvoidingView>
   );
@@ -155,42 +148,56 @@ export default function Checkout({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#ddd',
-  },
-  label: {fontSize: 14, marginBottom: 6, color: '#222'},
-  input: {
-    borderWidth: 1,
+    padding: 16,
     backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#000',
+  },
+  amountBox: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  amountText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#000',
   },
   cardContainer: {
-    height: 50,
-    marginVertical: 8,
-    borderColor: '#ddd',
+    backgroundColor: '#FFFFFF',
+    textColor: '#000000',
+    placeholderColor: '#9E9E9E',
     borderWidth: 1,
-    borderRadius: 8,
-  },
-  textAmount: {
-    fontSize: 12,
-  },
-  cardField: {
-    borderColor: '#ddd',
-    backgroundColor: 'white',
-    borderRadius: 8,
+    borderColor: '#CCCCCC',
+    borderRadius: 6,
     fontSize: 16,
   },
-  payButton: {
-    marginTop: 20,
-    backgroundColor: '#0B5345',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
+  cardField: {
+    width: '100%',
+    height: 60,
+    marginVertical: 12,
   },
-  payButtonText: {color: '#fff', fontSize: 16, fontWeight: '600'},
-  disabled: {opacity: 0.6},
-  small: {marginTop: 12, fontSize: 12, color: '#666'},
+  payButton: {
+    height: 50,
+    backgroundColor: '#4CAF50',
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  disabled: {
+    opacity: 0.6,
+  },
+  payButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

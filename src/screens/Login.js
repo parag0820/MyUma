@@ -80,6 +80,8 @@ const Login = ({navigation}) => {
       email: trimmedEmail,
       password: trimmedPassword,
     };
+    console.log('payload', payload);
+
     try {
       const loginResponse = await axios.post(
         `${BASE_URL}myumaloginbypassword`,
@@ -88,28 +90,24 @@ const Login = ({navigation}) => {
 
       // Check the actual success flag/message
       const res = loginResponse.data;
+      const userdata = res?.data;
+      const login = res.message;
+      console.log('userdata', userdata);
+      console.log('login', login);
 
-      console.log('Response Login', res?.payment_status);
+      await AsyncStorage.setItem('userInfo', JSON.stringify(userdata));
+
+      console.log('Response Login', res);
       if (
         (res?.status === true || res?.success === true) &&
         res?.payment_status === 'paid'
       ) {
-        console.log('Login successful:', res?.data);
-        const userdata = res?.data;
-        const login = res.message;
-        console.log('Response Login', login);
-
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userdata));
         await AsyncStorage.setItem('userLogin', JSON.stringify(login));
-        showToast(); // Show success message
+        showToast();
       } else {
-        // Handle invalid credentials case
-        const userdata = res?.data;
-
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userdata));
+        // await AsyncStorage.removeItem('userInfo');
         navigation.navigate('Pricing');
-        console.log('Invalid credentials:', res.message);
-        setPasswordError(res.message || 'Invalid credentials'); // Show error on UI
+        setPasswordError(res.message || 'Invalid credentials');
       }
     } catch (error) {
       console.log('Login error:', error);

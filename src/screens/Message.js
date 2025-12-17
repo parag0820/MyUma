@@ -68,7 +68,7 @@ const Message = () => {
         message,
       });
       setMessage('');
-      fetchMessages(); // Reload chat
+      fetchMessages();
     } catch (error) {
       console.error('Error sending message:', error);
     }

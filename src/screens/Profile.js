@@ -244,6 +244,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
+    color: '#000',
     width: '100%',
     padding: 10,
     borderRadius: 5,
